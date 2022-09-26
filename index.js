@@ -4,13 +4,9 @@
 
 let currentTrade = {};
 let currentSelectSide;
-// let tokens;
+let tokens;
 
 async function init() {
-  // console.log(" initializing...");
-  // let response = await fetch("https://tokens.coingecko.com/uniswap/all.json");
-  // let tokenListJSON = await response.json();
-  // console.log("Listing available tokens: ", tokenListJSON);
   await listAvailableTokens();
 }
 
@@ -51,21 +47,26 @@ function selectToken(token) {
   currentTrade[currentSelectSide] = token;
   // Log the selected token
   console.log("currentTrade:", currentTrade);
-  //renderInterface();
+  renderInterface();
 }
-
-// function renderInterface() {
-//   if (currentTrade.from) {
-//     console.log(currentTrade.from);
-//     document.getElementById("from_token_img").src = currentTrade.from.logoURI;
-//     document.getElementById("from_token_text").innerHTML =
-//       currentTrade.from.symbol;
-//   }
-//   if (currentTrade.to) {
-//     document.getElementById("to_token_img").src = currentTrade.to.logoURI;
-//     document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
-//   }
-// }
+//Function to display the image and token symbols
+function renderInterface() {
+  if (currentTrade.from) {
+    console.log(currentTrade.from);
+    // Set the form token image
+    document.getElementById("from_token_img").src = currentTrade.from.logoURI;
+    // Set the form token symbol text
+    document.getElementById("from_token_text").innerHTML =
+      currentTrade.from.symbol;
+  }
+  if (currentTrade.to) {
+    console.log(currentTrade.to);
+    // Set the to token image
+    document.getElementById("to_token_img").src = currentTrade.to.logoURI;
+    // Set the to token symbol text
+    document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
+  }
+}
 
 async function connect() {
   if (typeof window.ethereum !== "undefined") {
@@ -371,10 +372,9 @@ document.getElementById("login_button").onclick = connect;
 document.getElementById("from_token_select").onclick = () => {
   openModal("from");
 };
-//document.getElementById("to_token_select").onclick = openModal;
-//() => {
-//   openModal("to");
-// };
+document.getElementById("to_token_select").onclick = () => {
+  openModal("to");
+};
 document.getElementById("modal_close").onclick = closeModal;
 // document.getElementById("from_amount").onblur = getPrice;
 //document.getElementById("swap_button").onclick = trySwap;
