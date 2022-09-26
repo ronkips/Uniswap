@@ -1,12 +1,16 @@
-const { default: BigNumber } = require("bignumber.js");
-const qs = require("qs");
-const Web3 = require("web3");
+// const { default: BigNumber } = require("bignumber.js");
+// const qs = require("qs");
+// const Web3 = require("web3");
 
 let currentTrade = {};
 let currentSelectSide;
-let tokens;
+// let tokens;
 
 async function init() {
+  // console.log(" initializing...");
+  // let response = await fetch("https://tokens.coingecko.com/uniswap/all.json");
+  // let tokenListJSON = await response.json();
+  // console.log("Listing available tokens: ", tokenListJSON);
   await listAvailableTokens();
 }
 
@@ -14,22 +18,25 @@ async function listAvailableTokens() {
   console.log("initializing");
   let response = await fetch("https://tokens.coingecko.com/uniswap/all.json");
   let tokenListJSON = await response.json();
-  console.log("listing available tokens");
+  console.log("listing available tokens..");
   console.log(tokenListJSON);
   tokens = tokenListJSON.tokens;
   console.log("tokens:", tokens);
 
   // create token list for modal
   let parent = document.getElementById("token_list");
+  // Loop through all the tokens inside the token list JSON object
   for (const i in tokens) {
-    // token row in the modal token list
+    // create a token row in the modal token list
     let div = document.createElement("div");
     div.className = "token_row";
+    // For each row , display the token image and symbol
     let html = `
     <img class="token_list_img" src="${tokens[i].logoURI}">
       <span class="token_list_text">${tokens[i].symbol}</span>
       `;
     div.innerHTML = html;
+    // selectToken() will be called when a token is clicked
     div.onclick = () => {
       selectToken(tokens[i]);
     };
@@ -44,7 +51,7 @@ function selectToken(token) {
   currentTrade[currentSelectSide] = token;
   // Log the selected token
   console.log("currentTrade:", currentTrade);
-  renderInterface();
+  //renderInterface();
 }
 
 // function renderInterface() {
@@ -67,17 +74,19 @@ async function connect() {
       await ethereum.request({ method: "eth_requestAccounts" });
     } catch (error) {
       console.log(error);
-    }
+    } // If connected change button to connected
     document.getElementById("login_button").innerHTML = "Connected";
-    // const accounts = await ethereum.request({ method: "eth_accounts" });
+    // If conneceted, enable "Swap" button
     document.getElementById("swap_button").disabled = false;
-  } else {
+  } //  Ask user to Install Metamask if it's not detected
+  else {
     document.getElementById("login_button").innerHTML =
       "Please install MetaMask";
   }
 }
 
 function openModal(side) {
+  // Store whether the user has selected a token on the from or to side
   currentSelectSide = side;
   document.getElementById("token_modal").style.display = "block";
 }
@@ -357,14 +366,15 @@ function closeModal() {
 // }
 
 init();
-
+// Call the connect function when the login_button is clicked
 document.getElementById("login_button").onclick = connect;
 document.getElementById("from_token_select").onclick = () => {
   openModal("from");
 };
-document.getElementById("to_token_select").onclick = () => {
-  openModal("to");
-};
+//document.getElementById("to_token_select").onclick = openModal;
+//() => {
+//   openModal("to");
+// };
 document.getElementById("modal_close").onclick = closeModal;
-document.getElementById("from_amount").onblur = getPrice;
-document.getElementById("swap_button").onclick = trySwap;
+// document.getElementById("from_amount").onblur = getPrice;
+//document.getElementById("swap_button").onclick = trySwap;
