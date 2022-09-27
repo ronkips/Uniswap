@@ -1,7 +1,6 @@
 // const { default: BigNumber } = require("bignumber.js");
-// const qs = require("qs");
 // const Web3 = require("web3");
-
+const { qs } = require("qs");
 let currentTrade = {};
 let currentSelectSide;
 let tokens;
@@ -96,39 +95,41 @@ function closeModal() {
   document.getElementById("token_modal").style.display = "none";
 }
 
-// async function getPrice() {
-//   console.log("Getting Price");
+async function getPrice() {
+  console.log("Getting Price..");
+  // Only fetch price if from token, to token, and from token amount have ben filled in
+  if (
+    !currentTrade.from ||
+    !currentTrade.to ||
+    !document.getElementById("from_amount").value
+  )
+    return;
+  // The amount is calculeted from the smallest base unit of the token.
+  //We get this by multiplying the (from amount)  * (to the poer of the number of decimal places)
+  let amount = Number(
+    document.getElementById("from_amount").value *
+      10 ** currentTrade.from.decimals
+  );
 
-//   if (
-//     !currentTrade.from ||
-//     !currentTrade.to ||
-//     !document.getElementById("from_amount").value
-//   )
-//     return;
-//   let amount = Number(
-//     document.getElementById("from_amount").value *
-//       10 ** currentTrade.from.decimals
-//   );
+  const params = {
+    sellToken: currentTrade.from.address,
+    buyToken: currentTrade.to.address,
+    sellAmount: amount
+  };
 
-//   const params = {
-//     sellToken: currentTrade.from.address,
-//     buyToken: currentTrade.to.address,
-//     sellAmount: amount
-//   };
+  // Fetch the swap price.
+  const response = await fetch(
+    `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`
+  );
+  // Await a parse the JSON response
+  swapPriceJSON = await response.json();
+  console.log("Price: ", swapPriceJSON);
 
-//   // Fetch the swap price.
-//   const response = await fetch(
-//     `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`
-//   );
-
-//   swapPriceJSON = await response.json();
-//   console.log("Price: ", swapPriceJSON);
-
-//   document.getElementById("to_amount").value =
-//     swapPriceJSON.buyAmount / 10 ** currentTrade.to.decimals;
-//   document.getElementById("gas_estimate").innerHTML =
-//     swapPriceJSON.estimatedGas;
-// }
+  document.getElementById("to_amount").value =
+    swapPriceJSON.buyAmount / 10 ** currentTrade.to.decimals;
+  document.getElementById("gas_estimate").innerHTML =
+    swapPriceJSON.estimatedGas;
+}
 
 // async function getQuote(account) {
 //   console.log("Getting Quote");
@@ -376,5 +377,5 @@ document.getElementById("to_token_select").onclick = () => {
   openModal("to");
 };
 document.getElementById("modal_close").onclick = closeModal;
-// document.getElementById("from_amount").onblur = getPrice;
+document.getElementById("from_amount").onblur = getPrice;
 //document.getElementById("swap_button").onclick = trySwap;
